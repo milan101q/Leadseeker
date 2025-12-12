@@ -117,7 +117,7 @@ function App() {
               <Search size={20} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">LeadSeeker</h1>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Business Finder</h1>
               <span className="text-xs text-slate-500 font-medium">No-API Business Finder</span>
             </div>
           </div>

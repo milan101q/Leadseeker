@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LeadSeeker - Local Business Finder</title>
+    <title>Business Finder - Local Business Finder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Babel Standalone for in-browser JSX/TS compilation -->
@@ -45,7 +45,7 @@
       import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
       import { 
         Search, MapPin, SlidersHorizontal, Play, RefreshCw, AlertTriangle,
-        Terminal, ShieldAlert, CheckCircle, Star, ExternalLink, Download, Globe
+        Terminal, ShieldAlert, CheckCircle, Star, ExternalLink, Download, Globe, Briefcase
       } from 'https://esm.sh/lucide-react@0.294.0';
 
       // --- Types (Kept for reference, stripped by Babel) ---
@@ -89,11 +89,18 @@
         return x - Math.floor(x);
       };
 
-      const generateMockBusiness = (index, location) => {
+      const generateMockBusiness = (index, location, businessType) => {
         const seed = location.length + index + Date.now();
         const rand = () => seededRandom(seed + Math.random());
         
-        const type = BUSINESS_TYPES[Math.floor(rand() * BUSINESS_TYPES.length)];
+        let type;
+        if (businessType && businessType.trim().length > 0) {
+           // Capitalize first letter of words for display
+           type = businessType.trim().replace(/\b\w/g, c => c.toUpperCase());
+        } else {
+           type = BUSINESS_TYPES[Math.floor(rand() * BUSINESS_TYPES.length)];
+        }
+        
         const prefix = BUSINESS_PREFIXES[Math.floor(rand() * BUSINESS_PREFIXES.length)];
         const street = STREET_NAMES[Math.floor(rand() * STREET_NAMES.length)];
         const num = Math.floor(rand() * 9000) + 100;
@@ -305,6 +312,7 @@
         const [status, setStatus] = useState(AppStatus.IDLE);
         const [params, setParams] = useState({
           location: '',
+          businessType: '',
           quantity: 10,
           minReviews: 0,
           maxDistance: 5,
@@ -336,7 +344,8 @@
           setLogs([]);
           setProgress(0);
           addLog(`Initializing search in ${params.location}...`, 'process');
-          addLog(`Criteria: < ${params.ratingThreshold} Stars, ${params.requireNoWebsite ? 'NO Website' : 'Any Website'}.`, 'info');
+          const typeMsg = params.businessType ? `Type: ${params.businessType}` : 'All Business Types';
+          addLog(`Criteria: ${typeMsg}, < ${params.ratingThreshold} Stars, ${params.requireNoWebsite ? 'NO Website' : 'Any Website'}.`, 'info');
 
           let leadsFound = 0;
           let checkedCount = 0;
@@ -352,7 +361,7 @@
 
               await sleep(Math.random() * 800 + 200); 
 
-              const candidate = generateMockBusiness(checkedCount, params.location);
+              const candidate = generateMockBusiness(checkedCount, params.location, params.businessType);
               addLog(`Scanning "${candidate.name}"...`, 'process');
 
               if (params.requireNoWebsite && candidate.hasWebsite) {
@@ -397,7 +406,7 @@
                     <Search size={20} />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">LeadSeeker</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">Business Finder</h1>
                     <span className="text-xs text-slate-500 font-medium">No-API Business Finder</span>
                   </div>
                 </div>
@@ -431,6 +440,21 @@
                           value={params.location}
                           onChange={(e) => setParams(prev => ({ ...prev, location: e.target.value }))}
                           placeholder="e.g. Austin, TX"
+                          className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-slate-700">Business Type <span className="text-slate-400 font-normal text-xs">(Optional)</span></label>
+                      <div className="relative">
+                        <Briefcase className="absolute left-3 top-2.5 text-slate-400" size={18} />
+                        <input
+                          type="text"
+                          disabled={isScanning}
+                          value={params.businessType}
+                          onChange={(e) => setParams(prev => ({ ...prev, businessType: e.target.value }))}
+                          placeholder="e.g. Plumber, Dentist"
                           className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500"
                         />
                       </div>
