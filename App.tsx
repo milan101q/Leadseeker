@@ -118,7 +118,7 @@ function App() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">Business Finder</h1>
-              <span className="text-xs text-slate-500 font-medium">No-API Business Finder</span>
+              <span className="text-xs text-slate-500 font-medium">Easy Business Finder</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
